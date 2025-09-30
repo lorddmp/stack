@@ -1,0 +1,258 @@
+#include "stack.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+StackErr_t _Stack_Init(stack_t* stk, int capacity, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    if (capacity <= 0)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Stack capacity <= 0\n", ILLEGAL_CAPACITY);
+        return ILLEGAL_CAPACITY;
+    }
+
+    stk->data = (data_t*)calloc((size_t)capacity + 2, sizeof(data_t));
+    stk->capacity = capacity;
+
+    if (stk->data == NULL)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Calloc worked incorrectly\n", ERROR_CALLOC);
+        return ERROR_CALLOC;
+    }
+
+    stk->data[0] = CANARY1;
+    stk->data[capacity + 1] = CANARY2;
+    for(int i = 1; i < capacity + 1; i++)
+        stk->data[i] = {POISON};
+    
+    stk->size = 0;
+
+    return _Stack_Verify(stk, FILENAME, NUM_STRING, FUNCNAME);
+}
+
+StackErr_t _Stack_Push(stack_t* stk, data_t value, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    StackErr_t* err = NULL;
+
+    if (_Stack_Verify(stk, FILENAME, NUM_STRING, FUNCNAME)!= 0)
+        return *err;
+
+    if (_Stack_Bigger(stk, FILENAME, NUM_STRING, FUNCNAME))
+        return ERROR_REALLOC;
+
+    stk->data[stk->size + 1] = value;
+    stk->size++;
+
+    return _Stack_Verify(stk, FILENAME, NUM_STRING, FUNCNAME);
+}
+
+data_t _Stack_Pop(stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME,  StackErr_t *err)
+{
+    if (_Stack_Verify(stk, FILENAME, NUM_STRING, FUNCNAME) != 0)
+        return *err;
+    
+    if (stk->size == 0)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Empty stack\n", EMPTY_STACK);
+        return EMPTY_STACK;
+    }
+
+    stk->size--;
+    data_t varvar = stk->data[stk->size + 1];
+    stk->data[stk->size + 1] = POISON;
+    
+    return(varvar);
+}
+
+StackErr_t _Stack_Dump(stack_t stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    FILE* fp = fopen("errors_report.txt", "w");
+
+    if (fp == NULL)
+    {
+        _Stack_Dump(stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Empty stack\n", ERROR_OPEN_ERRORFILE);
+        return ERROR_OPEN_ERRORFILE;
+    }
+
+    fprintf(fp, "_Stack_Dump called from %s, %s:%d\n", FILENAME, FUNCNAME, NUM_STRING);
+    fprintf(fp, "stack [%p]\n\n", &stk);
+    fprintf(fp, "size = %d\n", stk.size);
+    fprintf(fp, "capacity = %d\n", stk.capacity);
+    fprintf(fp, "data [%p]\n", stk.data);
+    fprintf(fp, "{\n");
+    
+    for(int i = 1; i <= stk.capacity; i++)
+        fprintf(fp, "*[%d] = %lg\n", i, stk.data[i]);
+
+    fprintf(fp, "}\n");
+
+    fclose(fp);
+    return NO_ERRORS;
+}
+
+StackErr_t _Stack_Verify(stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    if (stk == NULL)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Stack pointer = 0x00000\n", ZERO_PTR_STACK);
+        return ZERO_PTR_STACK;
+    }
+
+    if (stk->capacity <= 0)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Stack capacity <= 0\n", ILLEGAL_CAPACITY);
+        return ILLEGAL_CAPACITY;
+    }
+
+    if (stk->data == NULL)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Data stack pointer = 0x00000\n", ZERO_PTR_DATASTACK);
+        return ZERO_PTR_DATASTACK;
+    }
+
+    if (stk->size < 0)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Illegal size of data\n", ILLEGAL_SIZE);
+        return ILLEGAL_SIZE;
+    }
+    
+    for (int i = stk->size; i < stk->capacity; i++)
+        if (stk->size < 0)
+        {
+            _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+            printf("Code error: %d. In free stack memory illegal values\n", POISON_ERROR);
+            return POISON_ERROR;
+        }
+
+    if (!(_Is_Zero(stk->data[0] - CANARY1)) || !(_Is_Zero(stk->data[stk->capacity + 1] - CANARY2)))
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Illegal size of data\n", CANARY_DEATH);
+        return CANARY_DEATH;
+    }
+
+    return NO_ERRORS;
+}
+
+StackErr_t _Stack_Destroyer(stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    _Stack_Verify(stk, FILENAME, NUM_STRING, FUNCNAME);
+
+    free(stk->data);
+    stk->data = NULL;
+    stk->capacity = -1;
+    stk->size = -1;
+    stk = NULL;
+
+    return NO_ERRORS;
+}
+
+StackErr_t _Stack_Bigger (stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    if (stk->size == stk->capacity)
+    {
+        data_t* var = NULL;
+        stk->capacity *= 2;
+        var = (data_t*)realloc(stk->data, ((size_t)stk->capacity + 2)*sizeof(data_t));
+
+        if (var == NULL)
+        {
+            _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+            printf("Code error: %d. Error realloc\n", ERROR_REALLOC);
+            return ERROR_REALLOC;
+        }
+
+        stk->data = var;
+
+        stk->data[stk->capacity + 1] = CANARY2;
+        for (int i = stk->capacity / 2 + 1; i <= stk->capacity; i++)
+            stk->data[i] = POISON;
+    }
+
+    return NO_ERRORS;
+}
+
+//SPU folder
+
+StackErr_t _Stack_Read(stack_t* stk, StackErr_t* err,  const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
+{
+    FILE* fp = fopen(INPUT_FILE, "r");
+    char command[8];
+    data_t num = 0;
+
+    if (fp == NULL)
+    {
+        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
+        printf("Code error: %d. Error realloc\n", ERROR_OPEN_INPUTFILE);
+        return ERROR_OPEN_INPUTFILE;
+    }
+
+    while (1)
+    {
+        fscanf(fp, "%s", command);
+
+        if (!(strcmp(command, "PUSH")))
+        {
+            fscanf(fp, "%lf", &num);
+            IF_ERROR_FUNC(_Stack_Push(stk, num, FILENAME, NUM_STRING, FUNCNAME));
+        }
+
+        if (!(strcmp(command, "POP")))
+            printf("%lg\n", _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err));
+        
+        if (!(strcmp(command, "ADD")))
+            _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) + 
+            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
+            FILENAME, NUM_STRING, FUNCNAME);
+
+        if (!(strcmp(command, "SUB")))
+            _Stack_Push(stk, -1 * _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) + 
+            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
+            FILENAME, NUM_STRING, FUNCNAME);
+
+        if (!(strcmp(command, "MUL")))
+            _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) * 
+            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
+            FILENAME, NUM_STRING, FUNCNAME);
+
+        if (!(strcmp(command, "DIV")))
+        {
+            data_t a = _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err);
+
+            if (_Is_Zero(a))
+                printf("NA NOL DELIT NELZYA!\n");
+            else
+                _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) /a , 
+            FILENAME, NUM_STRING, FUNCNAME);
+            
+        }
+
+        if (!(strcmp(command, "SQRT")))
+            _Stack_Push(stk, sqrt(_Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err)), 
+            FILENAME, NUM_STRING, FUNCNAME);
+
+        if (!(strcmp(command, "HLT")))
+            break;
+    }
+
+    fclose(fp);
+    
+    return NO_ERRORS;
+}
+
+int _Is_Zero(double a)
+{
+    if (a < 1e-9)
+        return 1;
+    else
+        return 0;
+}

@@ -1,0 +1,8 @@
+PUSH 10000
+PUSH 100
+DIV
+POP
+
+
+
+HLT
