@@ -1,12 +1,11 @@
 #include "operations.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 StackErr_t _Stack_Read(stack_t* stk, StackErr_t* err,  const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
-    // my_un test = {}
-
     FILE* fp = fopen(NAME_INPUT_FILE, "r");
     char command[8];
     data_t num = 0;
