@@ -1,6 +1,9 @@
-#include <stdio.h>
 #include "stack.h"
+#include "SPU/operations.h"
+
+#include <stdio.h>
 #include <string.h>
+
 
 int main()
 {
@@ -18,9 +21,7 @@ int main()
 }
 
 //-----сделать условную компиляцию
-//stackbigger добавить параметр для нового значения capacity
-//define error файла
+//-----stackbigger добавить параметр для нового значения capacity
+//-----define error файла
 //-----канарейки в структуре
 //создать папочку с калькулятором
-//*дополнить калькулятор: сделать массив структур для команд, создавать массив union
-//сделать калькулятор через массив union

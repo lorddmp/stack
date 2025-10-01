@@ -3,7 +3,8 @@
 
 #include <stdlib.h>
 
-#define INPUT_FILE "stack_commands.txt"
+#define NAME_INPUT_FILE "stack_commands.txt"
+#define NAME_ERROR_FILE "errors_report.txt"
 
 #define ZASHITA
 
@@ -33,7 +34,6 @@
     }
 
 typedef double data_t;
-
 #define SPEC "%lg"
 
 typedef struct stack_str
@@ -78,8 +78,6 @@ StackErr_t _Stack_Verify(stack_t* stk, const char* FILENAME, const int NUM_STRIN
 StackErr_t _Stack_Destroyer(stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME);
 
 StackErr_t _Stack_Bigger(stack_t* stk, int capacity, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME);
-
-StackErr_t _Stack_Read(stack_t* stk, StackErr_t* err, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME);
 
 int _Is_Zero(double a);
 

@@ -4,8 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-
-
 #define POISON 7062007
 #define CANARY1 0xDEDDED
 #define CANARY2 0xDADDAD
@@ -51,10 +49,9 @@ StackErr_t _Stack_Push(stack_t* stk, data_t value, const char* FILENAME, const i
         return *err;
 
     if (stk->capacity == stk->size \
-            && _Stack_Bigger(stk, stk->capacity*2,  FILENAME, NUM_STRING, FUNCNAME))
+            && _Stack_Bigger(stk, stk->capacity <<= 1,  FILENAME, NUM_STRING, FUNCNAME))
         return ERROR_REALLOC;
 
-    stk->capacity <<= 1;
     stk->data[stk->size + 1] = value;
     stk->size++;
 
@@ -85,7 +82,7 @@ data_t _Stack_Pop(stack_t* stk, const char* FILENAME, const int NUM_STRING, cons
 
 StackErr_t _Stack_Dump(stack_t stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
-    FILE* fp = fopen("errors_report.txt", "w");
+    FILE* fp = fopen(NAME_ERROR_FILE, "w");
 
     if (fp == NULL)
     {
@@ -183,15 +180,16 @@ StackErr_t _Stack_Destroyer(stack_t* stk, const char* FILENAME, const int NUM_ST
 StackErr_t _Stack_Bigger (stack_t* stk, int capacity, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
     
-    data_t* var = NULL;
-    stk->capacity <<= 1; 
-    var = (data_t*)realloc(stk->data, ((size_t)stk->capacity + 2)*sizeof(data_t));
+    data_t* var = NULL; 
+    var = (data_t*)realloc(stk->data, ((size_t)capacity + 2)*sizeof(data_t));
+
     if (var == NULL)
     {
         _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
         printf("Code error: %d. Error realloc\n", ERROR_REALLOC);
         return ERROR_REALLOC;
     }
+
     stk->data = var;
     stk->data[stk->capacity + 1] = CANARY2;
     for (int i = stk->capacity / 2 + 1; i <= stk->capacity; i++)
@@ -209,78 +207,6 @@ StackErr_t _Stack_Bigger (stack_t* stk, int capacity, const char* FILENAME, cons
 // };
 
 // {"PUSH", 4, PUSH_CMD}
-
-StackErr_t _Stack_Read(stack_t* stk, StackErr_t* err,  const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
-{
-    // my_un test = {}
-
-    FILE* fp = fopen(INPUT_FILE, "r");
-    char command[8];
-    data_t num = 0;
-
-    if (fp == NULL)
-    {
-        _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
-        printf("Code error: %d. Error open file\n", ERROR_OPEN_INPUTFILE);
-        return ERROR_OPEN_INPUTFILE;
-    }
-
-    while (1)
-    {
-        fscanf(fp, "%s", command);
-        if (!(strcmp(command, "PUSH")))
-        {
-            if (fscanf(fp, "%lf", &num) == 0)
-            {
-                _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
-                printf("Code error: %d. Error open file\n", ERROR_PUSH_NUM);
-                return ERROR_PUSH_NUM;
-            }
-
-            IF_ERROR(_Stack_Push(stk, num, FILENAME, NUM_STRING, FUNCNAME), *stk);
-        }
-
-        if (!(strcmp(command, "POP")))
-            printf("%lg\n", _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err));
-        
-        if (!(strcmp(command, "ADD")))
-            _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) + 
-            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
-            FILENAME, NUM_STRING, FUNCNAME);
-
-        if (!(strcmp(command, "SUB")))
-            _Stack_Push(stk, -1 * _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) + 
-            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
-            FILENAME, NUM_STRING, FUNCNAME);
-
-        if (!(strcmp(command, "MUL")))
-            _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) * 
-            _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err), 
-            FILENAME, NUM_STRING, FUNCNAME);
-
-        if (!(strcmp(command, "DIV")))
-        {
-            data_t a = _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err);
-
-            if (_Is_Zero(a))
-                printf("NA NOL DELIT NELZYA!\n");
-            else
-                _Stack_Push(stk, _Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err) /a , 
-            FILENAME, NUM_STRING, FUNCNAME);
-        }
-
-        if (!(strcmp(command, "SQRT")))
-            _Stack_Push(stk, sqrt(_Stack_Pop(stk, FILENAME, NUM_STRING, FUNCNAME, err)), 
-            FILENAME, NUM_STRING, FUNCNAME);
-
-        if (!(strcmp(command, "HLT")))
-            break;
-    }
-
-    fclose(fp);
-    
-    return NO_ERRORS;
-}
 
 int _Is_Zero(double a)
 {
