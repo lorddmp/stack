@@ -1,33 +1,26 @@
 #include <stdio.h>
 #include "stack.h"
-
-#define StackInit(stk, capacity) _Stack_Init(stk, capacity, __FILE__, __LINE__, __func__)
-#define StackPush(stk, num) _Stack_Push(stk, num, __FILE__, __LINE__, __func__)
-#define StackPop(stk, err) _Stack_Pop(stk, __FILE__, __LINE__, __func__, err)
-#define StackDestroyer(stk) _Stack_Destroyer(stk, __FILE__, __LINE__, __func__)
-#define StackDump(stk) _Stack_Dump(stk, __FILE__, __LINE__, __func__)
-#define StackRead(stk, err) _Stack_Read(stk, err, __FILE__, __LINE__, __func__)
-
-#define IF_ERROR(arg)  \
-    if (arg)\
-    {\
-        StackDump(stk);\
-        StackDestroyer(&stk);\
-        return 0;\
-    }
+#include <string.h>
 
 int main()
 {
     StackErr_t err = NO_ERRORS;
     stack_t stk = {};
 
-    IF_ERROR(StackInit(&stk, 7));
+    IF_ERROR(StackInit(&stk, 2), stk);
 
-    IF_ERROR(StackRead(&stk, &err));
+    IF_ERROR(StackRead(&stk, &err), stk);
 
-    IF_ERROR(StackDump(stk));
-    IF_ERROR(StackDestroyer(&stk));
-
+    IF_ERROR(StackDump(stk), stk);
+    IF_ERROR(StackDestroyer(&stk), stk);
 
     return 0;
 }
+
+//-----сделать условную компиляцию
+//stackbigger добавить параметр для нового значения capacity
+//define error файла
+//-----канарейки в структуре
+//создать папочку с калькулятором
+//*дополнить калькулятор: сделать массив структур для команд, создавать массив union
+//сделать калькулятор через массив union
