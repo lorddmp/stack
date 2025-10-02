@@ -5,6 +5,7 @@
 
 #define NAME_INPUT_FILE "stack_commands.txt"
 #define NAME_ERROR_FILE "errors_report.txt"
+#define NAME_BYTECODE_FILE "bytecode_file.txt"
 
 #define ZASHITA
 
