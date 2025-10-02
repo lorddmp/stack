@@ -141,7 +141,7 @@ StackErr_t _Stack_Verify(stack_t* stk, const char* FILENAME, const int NUM_STRIN
         if (!(_Is_Zero(stk->data[i] - POISON)))
         {
             _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
-            //printf("Code error: %d. In free stack memory illegal values\n", POISON_ERROR);
+            printf("Code error: %d. In free stack memory illegal values\n", POISON_ERROR);
             return POISON_ERROR;
         }
 
@@ -179,9 +179,7 @@ StackErr_t _Stack_Destroyer(stack_t* stk, const char* FILENAME, const int NUM_ST
 
 StackErr_t _Stack_Bigger (stack_t* stk, int capacity, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
-    
-    data_t* var = NULL; 
-    var = (data_t*)realloc(stk->data, ((size_t)capacity + 2)*sizeof(data_t));
+    data_t *var = (data_t*)realloc(stk->data, ((size_t)capacity + 2)*sizeof(data_t));
 
     if (var == NULL)
     {
@@ -198,14 +196,6 @@ StackErr_t _Stack_Bigger (stack_t* stk, int capacity, const char* FILENAME, cons
 
     return NO_ERRORS;
 }
-
-//SPU folder
-
-// union (token) my_un {
-//     enum OPERATIONS x;
-//     data_t y;
-// };
-
 // {"PUSH", 4, PUSH_CMD}
 
 int _Is_Zero(double a)

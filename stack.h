@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define NAME_INPUT_FILE "SPU/stack_commands.txt"
+#define NAME_INPUT_FILE "../stack_commands.txt"
 #define NAME_ERROR_FILE "errors_report.txt"
 
 #define ZASHITA
