@@ -1,5 +1,5 @@
 #include "stack.h"
-#include "SPU/operations.h"
+#include "../operations.h"
 
 #include <stdio.h>
 #include <string.h>
