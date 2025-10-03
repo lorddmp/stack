@@ -5,7 +5,7 @@
 
 #define NAME_INPUT_FILE "stack_commands.txt"
 #define NAME_ERROR_FILE "errors_report.txt"
-#define NAME_BYTECODE_FILE "bytecode_file.txt"
+#define NAME_BYTECODE_FILE "bytecode_file"
 
 #define ZASHITA
 
@@ -48,21 +48,20 @@ typedef struct stack_str
 
 enum StackErr_t {
     NO_ERRORS = 0,
-    ZERO_PTR_STACK = 1,
-    ZERO_PTR_DATASTACK = 2,
-    ERROR_CALLOC = 3,
-    ILLEGAL_CAPACITY = 4,
-    NO_ELEMENTS = 5,
-    ILLEGAL_SIZE = 6,
-    ILLEGAL_VALUE = 7,
-    ILLEGAL_FUNC_MODE = 8,
-    EMPTY_STACK = 9,
-    POISON_ERROR = 10,
-    ERROR_OPEN_ERRORFILE = 11,
-    CANARY_DEATH = 12,
-    ERROR_REALLOC = 13,
-    ERROR_OPEN_INPUTFILE = 14,
-    ERROR_PUSH_NUM = 15,
+    ERROR_OPEN_INPUTFILE = 1,
+    ERROR_OPEN_ERRORFILE = 2,
+    ERROR_CREATING_BYTYCODE_FILE = 3,
+    ZERO_PTR_STACK = 4,
+    ZERO_PTR_DATASTACK = 5,
+    ILLEGAL_CAPACITY = 6,
+    EMPTY_STACK = 7,
+    ILLEGAL_SIZE = 8,
+    POISON_ERROR = 9,
+    CANARY_DEATH = 10,
+    ERROR_CALLOC = 11,
+    ERROR_REALLOC = 12,
+    ERROR_PUSH_NUM = 13,
+    ILLEGAL_COMMAND = 14,
 };
 
 

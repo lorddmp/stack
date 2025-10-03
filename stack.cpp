@@ -151,19 +151,12 @@ StackErr_t _Stack_Verify(stack_t* stk, const char* FILENAME, const int NUM_STRIN
     (stk->can_struck2 != CANARY_STRUCK2)))
     {
         _Stack_Dump(*stk, FILENAME, NUM_STRING, FUNCNAME);
-        printf("Code error: %d. Illegal size of data\n", CANARY_DEATH);
+        printf("Code error: %d. Canary was dead. RIP\n", CANARY_DEATH);
         return CANARY_DEATH;
     }
 
     return NO_ERRORS;
 }
-
-//stack_t stk1 = {}; 0x0111
-
-//int x = 5; 0x10 => 5
-//int *x_ptr = &x; 0x20 => NULL
-
-//destroy(&stk1); (stk)0x222
 
 StackErr_t _Stack_Destroyer(stack_t* stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
@@ -196,7 +189,6 @@ StackErr_t _Stack_Bigger (stack_t* stk, int capacity, const char* FILENAME, cons
 
     return NO_ERRORS;
 }
-// {"PUSH", 4, PUSH_CMD}
 
 int _Is_Zero(double a)
 {
