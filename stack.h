@@ -17,18 +17,19 @@
 
 #endif
 
-#define StackInit(stk, capacity) _Stack_Init(stk, capacity, __FILE__, __LINE__, __func__)
-#define StackPush(stk, num) _Stack_Push(stk, num, __FILE__, __LINE__, __func__)
-#define StackPop(stk, err) _Stack_Pop(stk, __FILE__, __LINE__, __func__, err)
-#define StackDestroyer(stk) _Stack_Destroyer(stk, __FILE__, __LINE__, __func__)
-#define StackDump(stk) _Stack_Dump(stk, __FILE__, __LINE__, __func__)
+#define StackInit(processor, capacity) _Stack_Init(processor, capacity, __FILE__, __LINE__, __func__)
+#define StackPush(processor, num) _Stack_Push(processor, num, __FILE__, __LINE__, __func__)
+#define StackPop(processor, err) _Stack_Pop(processor, __FILE__, __LINE__, __func__, err)
+#define StackDestroyer(processor) _Stack_Destroyer(processor, __FILE__, __LINE__, __func__)
+#define StackDump(processor) _Stack_Dump(processor, __FILE__, __LINE__, __func__)
 
-#define IF_ERROR(arg, stk)      \
-    if (arg)                    \
-    {                           \
-        StackDump(stk);         \
-        StackDestroyer(&stk);   \
-        return NO_ERRORS;       \
+#define IF_ERROR(arg, stk)                  \
+    if (arg)                                \
+    {                                       \
+        printf("%d", arg);                  \
+        StackDump(stk);                     \
+        StackDestroyer(&stk);               \
+        return NO_ERRORS;                   \
     }
 
 typedef double data_t;
@@ -63,6 +64,7 @@ enum StackErr_t {
     ILLEGAL_REGISTER = 16,
 };
 
+#include "../processor.h"
 
 StackErr_t _Stack_Init(stack_t* stk, int capacity, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME);
 

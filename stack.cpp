@@ -43,10 +43,10 @@ StackErr_t _Stack_Init(stack_t* stk, int capacity, const char* FILENAME, const i
 
 StackErr_t _Stack_Push(stack_t* stk, data_t value, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
-    StackErr_t* err = NULL;
+    StackErr_t err = NO_ERRORS;
 
-    if (VERIF(stk) != 0)
-        return *err;
+    if ((err = VERIF(stk)) != 0)
+        return err;
 
     if (stk->capacity == stk->size \
             && _Stack_Bigger(stk, stk->capacity <<= 1,  FILENAME, NUM_STRING, FUNCNAME))
@@ -82,7 +82,7 @@ data_t _Stack_Pop(stack_t* stk, const char* FILENAME, const int NUM_STRING, cons
 
 StackErr_t _Stack_Dump(stack_t stk, const char* FILENAME, const int NUM_STRING, const char* FUNCNAME)
 {
-    FILE* fp = fopen(NAME_ERROR_FILE, "a");
+    FILE* fp = fopen(NAME_ERROR_FILE, "w");
 
     if (fp == NULL)
     {
@@ -91,7 +91,7 @@ StackErr_t _Stack_Dump(stack_t stk, const char* FILENAME, const int NUM_STRING, 
         return ERROR_OPEN_ERRORFILE;
     }
 
-    fprintf(fp, "\n\n_Stack_Dump called from %s, %s:%d\n", FILENAME, FUNCNAME, NUM_STRING);
+    fprintf(fp, "_Stack_Dump called from %s, %s:%d\n", FILENAME, FUNCNAME, NUM_STRING);
     fprintf(fp, "stack [%p]\n\n", &stk);
     fprintf(fp, "size = %d\n", stk.size);
     fprintf(fp, "capacity = %d\n", stk.capacity);
